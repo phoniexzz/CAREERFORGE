@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Praveen Binoy – Business Analytics Graduate</title>
+    <meta
+      name="description"
+      content="CV of Praveen Binoy, MSc Business Analytics Graduate with experience in data-driven performance analysis, KPI tracking, and optimisation."
+    />
+    <style>
+      /* ── Tokens ─────────────────────────────────────────── */
+      :root {
+        --brand: #0e7490;
+        --brand-soft: #e0f2f7;
+        --text: #1a2b35;
+        --muted: #607482;
+        --border: #dde5ea;
+        --bg: #ffffff;
+        --section-bg: #f7fafc;
+        --badge-bg: #eef2f5;
+        --warn: #b45309;
+        --warn-bg: #fef3c7;
+        --success: #15803d;
+        --success-bg: #dcfce7;
+        --primary-hl: #e0f2fe;
+        --primary-hl-border: #7dd3fc;
+        --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+        --mono: "Courier New", monospace;
+      }
+
+      /* ── Reset ──────────────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font);
+        background: #eef2f6;
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem 4rem;
+        font-size: 14px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Paper ──────────────────────────────────────────── */
+      .paper {
+        background: var(--bg);
+        width: 100%;
+        max-width: 780px;
+        border-radius: 14px;
+        box-shadow:
+          0 4px 24px rgba(0, 0, 0, 0.1),
+          0 1px 4px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+      }
+
+      /* ── Header ─────────────────────────────────────────── */
+      .header {
+        padding: 2.5rem 2.5rem 2rem;
+        text-align: center;
+        border-bottom: 1.5px solid var(--border);
+      }
+      .header h1 {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: var(--text);
+      }
+      .header .headline {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--brand);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-top: 0.25rem;
+      }
+      .header .contact {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 0.4rem;
+      }
+      .header .contact a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .header .contact a:hover {
+        color: var(--brand);
+      }
+
+      /* ── Body grid ───────────────────────────────────────── */
+      .body {
+        padding: 2rem 2.5rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      /* ── Section ─────────────────────────────────────────── */
+      section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+      }
+      .section-label {
+        font-size: 0.67rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--brand);
+        padding-bottom: 0.4rem;
+        border-bottom: 1.5px solid var(--border);
+      }
+
+      /* ── Summary ─────────────────────────────────────────── */
+      .summary-text {
+        font-size: 0.82rem;
+        color: var(--text);
+        line-height: 1.75;
+      }
+
+      /* ── Experience ──────────────────────────────────────── */
+      .exp-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .exp-meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.25rem;
+      }
+      .exp-title {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--text);
+      }
+      .exp-period {
+        font-size: 0.75rem;
+        font-family: var(--mono);
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .exp-org {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--brand);
+      }
+      .exp-bullets {
+        list-style: disc;
+        padding-left: 1.3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+      }
+      .exp-bullets li {
+        font-size: 0.8rem;
+        line-height: 1.6;
+        color: var(--text);
+      }
+
+      /* ── Skills ──────────────────────────────────────────── */
+      .skills-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .skill-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border: 1px solid var(--border);
+        background: var(--badge-bg);
+        color: var(--text);
+      }
+      .skill-chip.proposed {
+        background: var(--warn-bg);
+        border: 1.5px dashed var(--warn);
+        color: var(--warn);
+        font-weight: 600;
+      }
+      .skill-chip.proposed .icon {
+        font-size: 0.7rem;
+      }
+
+      /* ── Education ───────────────────────────────────────── */
+      .edu-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .edu-degree {
+        font-weight: 700;
+        font-size: 0.88rem;
+      }
+      .edu-institution {
+        font-size: 0.8rem;
+        color: var(--brand);
+        font-weight: 600;
+      }
+      .edu-detail {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      /* ── AI Badges ───────────────────────────────────────── */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+        font-size: 0.67rem;
+        font-weight: 700;
+        line-height: 1;
+        vertical-align: middle;
+        margin-left: 0.3rem;
+      }
+      .badge.optimized {
+        background: var(--primary-hl);
+        border: 1px solid var(--primary-hl-border);
+        color: var(--brand);
+      }
+      .badge.keywords {
+        background: var(--primary-hl);
+        border: 1px solid var(--primary-hl-border);
+        color: var(--brand);
+      }
+
+      /* ── Print / A4 overrides ────────────────────────────── */
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+        .paper {
+          box-shadow: none;
+          border-radius: 0;
+          max-width: 100%;
+        }
+        .badge {
+          display: none;
+        }
+        .skill-chip.proposed {
+          border-style: solid;
+        }
+      }
+
+      /* ── Responsive breakpoints ──────────────────────────── */
+      @media (max-width: 600px) {
+        .body {
+          padding: 1.25rem 1.25rem 2rem;
+        }
+        .header {
+          padding: 1.5rem 1.25rem 1.25rem;
+        }
+        .exp-meta {
+          flex-direction: column;
+        }
+        .exp-period {
+          align-self: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <article class="paper" role="main">
+      <!-- ═══ HEADER ═══════════════════════════════════════════ -->
+      <header class="header">
+        <h1>Praveen Binoy</h1>
+        <p class="headline">Business Analytics Graduate</p>
+        <p class="contact">
+          London, UK &nbsp;·&nbsp;
+          <a href="mailto:graduate@example.com">graduate@example.com</a>
+          &nbsp;·&nbsp; +44 7700 900077
+        </p>
+      </header>
+
+      <!-- ═══ BODY ═════════════════════════════════════════════ -->
+      <div class="body">
+        <!-- PROFESSIONAL SUMMARY -->
+        <section aria-labelledby="lbl-summary">
+          <h2 id="lbl-summary" class="section-label">Professional Summary</h2>
+          <p class="summary-text">
+            MSc Business Analytics &amp; Management Science graduate
+            (Distinction, University of Southampton) with experience in
+            data-driven performance analysis, KPI tracking, and optimisation
+            across ESG, maritime analytics, and financial modelling projects in
+            collaboration with Roke Manor Research and Northrop Grumman. Skilled
+            in Python and Power BI to generate actionable insights, improve
+            decision-making, and support business and marketing performance.
+            Strong interest in campaign analytics, customer insights, and
+            data-driven growth strategies. Relevant strengths for this role
+            include Data analysis.
+            <span class="badge optimized" title="AI Optimised"
+              >✨ Optimised</span
+            >
+          </p>
+        </section>
+
+        <!-- EXPERIENCE -->
+        <section aria-labelledby="lbl-exp">
+          <h2 id="lbl-exp" class="section-label">Experience</h2>
+
+          <!-- Job 1 -->
+          <div class="exp-block">
+            <div class="exp-meta">
+              <span class="exp-title">ESG &amp; Sustainability Intern</span>
+              <span class="exp-period">2025-06 – 2025-11</span>
+            </div>
+            <p class="exp-org">Action Hampshire</p>
+            <ul class="exp-bullets">
+              <li>
+                Analysed organisational and impact data to improve reporting
+                accuracy by 25%, enabling more effective performance tracking
+                and decision-making.
+                <span class="badge keywords" title="AI Added Keywords"
+                  >✨ Added Keywords</span
+                >
+              </li>
+              <li>
+                Built Power BI dashboards to monitor KPIs and organisational
+                performance, improving visibility and stakeholder insights by
+                20%.
+              </li>
+              <li>
+                Consolidated cost and policy data, increasing transparency by
+                30% and supporting data-driven strategic planning.
+              </li>
+              <li>
+                Translated complex data into actionable insights for
+                stakeholders, supporting reporting, planning, and performance
+                evaluation.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Job 2 -->
+          <div class="exp-block">
+            <div class="exp-meta">
+              <span class="exp-title">Maritime Data Analytics Intern</span>
+              <span class="exp-period">2025-05 – 2025-09</span>
+            </div>
+            <p class="exp-org">Roke Manor Research</p>
+            <ul class="exp-bullets">
+              <li>
+                Developed Python-based analytics pipelines to identify
+                behavioural patterns and anomalies in large datasets, enabling
+                insight generation for decision-making.
+              </li>
+              <li>
+                Automated data processing and modelling workflows, reducing
+                analysis time by 40% and improving efficiency.
+              </li>
+              <li>
+                Improved model performance and reduced false positives by 30%
+                through validation and optimisation techniques.
+              </li>
+              <li>
+                Aligned analytical outputs with KPI tracking frameworks and
+                stakeholder reporting requirements.
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- KEY SKILLS -->
+        <section aria-labelledby="lbl-skills">
+          <h2 id="lbl-skills" class="section-label">Key Skills</h2>
+          <div class="skills-grid">
+            <span class="skill-chip">Python</span>
+            <span class="skill-chip">Power BI</span>
+            <span class="skill-chip">Excel</span>
+            <span class="skill-chip">Word</span>
+            <span class="skill-chip">PowerPoint</span>
+            <span class="skill-chip">Data Analysis</span>
+            <span class="skill-chip">Forecasting</span>
+            <span class="skill-chip">Optimisation</span>
+            <span class="skill-chip">Machine Learning</span>
+            <span class="skill-chip">Risk Analysis</span>
+            <span class="skill-chip">KPI Tracking</span>
+            <span class="skill-chip">Campaign Analysis</span>
+            <span class="skill-chip">Customer Insights</span>
+            <span class="skill-chip">Market Research</span>
+            <span class="skill-chip">Performance Analysis</span>
+            <span class="skill-chip proposed">
+              <span class="icon">⚠️</span>
+              Stakeholder management
+              <span style="font-size: 0.6rem; opacity: 0.8"
+                >(PROPOSED GAPS)</span
+              >
+            </span>
+          </div>
+        </section>
+
+        <!-- EDUCATION -->
+        <section aria-labelledby="lbl-edu">
+          <h2 id="lbl-edu" class="section-label">Education</h2>
+          <div class="edu-block">
+            <p class="edu-degree">
+              MSc Business Analytics &amp; Management Science –
+              <em>Distinction</em>
+            </p>
+            <p class="edu-institution">University of Southampton</p>
+            <p class="edu-detail">2024 – 2025 &nbsp;·&nbsp; Southampton, UK</p>
+          </div>
+          <div class="edu-block">
+            <p class="edu-degree">BSc Business Management</p>
+            <p class="edu-institution">University of Southampton</p>
+            <p class="edu-detail">2021 – 2024 &nbsp;·&nbsp; Southampton, UK</p>
+          </div>
+        </section>
+      </div>
+      <!-- /.body -->
+    </article>
+  </body>
+</html>
