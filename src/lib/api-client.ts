@@ -334,6 +334,18 @@ const saveDemoPreferences = (prefs: MatchPreferences) => {
   setStorageItem("careerforge_demo_preferences", prefs);
 };
 
+const DEFAULT_VERSIONS = [
+  {
+    id: "v_001",
+    revision: 1,
+    reason: "created",
+    createdAt: new Date(Date.now() - 3 * 24 * 3600000).toISOString(),
+  }
+];
+
+const getDemoVersions = () => getStorageItem<any[]>("careerforge_demo_versions", DEFAULT_VERSIONS);
+const saveDemoVersions = (versions: any[]) => setStorageItem("careerforge_demo_versions", versions);
+
 // --- CLIENT-SIDE INTERCEPT ROUTER ---
 async function handleMockRequest(path: string, init: RequestInit): Promise<any> {
   const method = (init.method || "GET").toUpperCase();
@@ -456,6 +468,31 @@ async function handleMockRequest(path: string, init: RequestInit): Promise<any> 
       warnings: [],
       suggestions: []
     };
+  }
+
+  if (path.match(/^\/resumes\/[a-zA-Z0-9_-]+\/versions$/)) {
+    if (method === "POST") {
+      const resume = getDemoResume();
+      const versions = getDemoVersions();
+      const newVer = {
+        id: "v_" + Date.now(),
+        revision: resume.revision,
+        reason: body?.reason || "manual",
+        createdAt: new Date().toISOString()
+      };
+      versions.unshift(newVer);
+      saveDemoVersions(versions);
+      return newVer;
+    }
+    return getDemoVersions();
+  }
+
+  if (path.match(/^\/resumes\/[a-zA-Z0-9_-]+\/versions\/[a-zA-Z0-9_-]+\/restore$/)) {
+    return getDemoResume();
+  }
+
+  if (path === "/resumes/migrate") {
+    return getDemoResume();
   }
 
   // 3. Matchmaker Handlers
