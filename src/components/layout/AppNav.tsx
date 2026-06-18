@@ -38,7 +38,8 @@ export function AppNav() {
     location.pathname === "/verify" ||
     location.pathname === "/forgot-password" ||
     location.pathname === "/reset-password" ||
-    location.pathname === "/recover-account";
+    location.pathname === "/recover-account" ||
+    location.pathname === "/accept-advisor-invite";
 
   return (
     <nav className="sticky top-0 z-50 h-16 border-b border-[#d9e2e7] bg-white/95 backdrop-blur">

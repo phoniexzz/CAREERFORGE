@@ -17,6 +17,7 @@ export interface AuthUser {
   role: "student" | "advisor";
   isVerified: boolean;
   isActive: boolean;
+  canManageAdvisors?: boolean;
   deletionScheduledAt?: string | null;
   createdAt: string;
 }

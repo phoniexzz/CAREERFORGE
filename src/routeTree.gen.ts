@@ -25,8 +25,10 @@ import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdvisorRouteImport } from './routes/advisor'
 import { Route as AccountRouteImport } from './routes/account'
+import { Route as AcceptAdvisorInviteRouteImport } from './routes/accept-advisor-invite'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TailorIndexRouteImport } from './routes/tailor.index'
+import { Route as AdvisorIndexRouteImport } from './routes/advisor.index'
 import { Route as TailorStrategyRouteImport } from './routes/tailor.strategy'
 import { Route as TailorReadinessRouteImport } from './routes/tailor.readiness'
 import { Route as TailorMatchRouteImport } from './routes/tailor.match'
@@ -34,6 +36,9 @@ import { Route as TailorExportRouteImport } from './routes/tailor.export'
 import { Route as TailorCvRouteImport } from './routes/tailor.cv'
 import { Route as TailorCoverLetterRouteImport } from './routes/tailor.cover-letter'
 import { Route as MatchmakerJobSlugRouteImport } from './routes/matchmaker.$jobSlug'
+import { Route as AdvisorTeamRouteImport } from './routes/advisor.team'
+import { Route as AdvisorAnalyticsRouteImport } from './routes/advisor.analytics'
+import { Route as AdvisorReviewsReviewIdRouteImport } from './routes/advisor.reviews.$reviewId'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -115,6 +120,11 @@ const AccountRoute = AccountRouteImport.update({
   path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcceptAdvisorInviteRoute = AcceptAdvisorInviteRouteImport.update({
+  id: '/accept-advisor-invite',
+  path: '/accept-advisor-invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -124,6 +134,11 @@ const TailorIndexRoute = TailorIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => TailorRoute,
+} as any)
+const AdvisorIndexRoute = AdvisorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdvisorRoute,
 } as any)
 const TailorStrategyRoute = TailorStrategyRouteImport.update({
   id: '/strategy',
@@ -160,11 +175,27 @@ const MatchmakerJobSlugRoute = MatchmakerJobSlugRouteImport.update({
   path: '/$jobSlug',
   getParentRoute: () => MatchmakerRoute,
 } as any)
+const AdvisorTeamRoute = AdvisorTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AdvisorRoute,
+} as any)
+const AdvisorAnalyticsRoute = AdvisorAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdvisorRoute,
+} as any)
+const AdvisorReviewsReviewIdRoute = AdvisorReviewsReviewIdRouteImport.update({
+  id: '/reviews/$reviewId',
+  path: '/reviews/$reviewId',
+  getParentRoute: () => AdvisorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accept-advisor-invite': typeof AcceptAdvisorInviteRoute
   '/account': typeof AccountRoute
-  '/advisor': typeof AdvisorRoute
+  '/advisor': typeof AdvisorRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/builder': typeof BuilderRoute
   '/cv': typeof CvRoute
@@ -179,6 +210,8 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/tailor': typeof TailorRouteWithChildren
   '/verify': typeof VerifyRoute
+  '/advisor/analytics': typeof AdvisorAnalyticsRoute
+  '/advisor/team': typeof AdvisorTeamRoute
   '/matchmaker/$jobSlug': typeof MatchmakerJobSlugRoute
   '/tailor/cover-letter': typeof TailorCoverLetterRoute
   '/tailor/cv': typeof TailorCvRoute
@@ -186,12 +219,14 @@ export interface FileRoutesByFullPath {
   '/tailor/match': typeof TailorMatchRoute
   '/tailor/readiness': typeof TailorReadinessRoute
   '/tailor/strategy': typeof TailorStrategyRoute
+  '/advisor/': typeof AdvisorIndexRoute
   '/tailor/': typeof TailorIndexRoute
+  '/advisor/reviews/$reviewId': typeof AdvisorReviewsReviewIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accept-advisor-invite': typeof AcceptAdvisorInviteRoute
   '/account': typeof AccountRoute
-  '/advisor': typeof AdvisorRoute
   '/analytics': typeof AnalyticsRoute
   '/builder': typeof BuilderRoute
   '/cv': typeof CvRoute
@@ -205,6 +240,8 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/review': typeof ReviewRoute
   '/verify': typeof VerifyRoute
+  '/advisor/analytics': typeof AdvisorAnalyticsRoute
+  '/advisor/team': typeof AdvisorTeamRoute
   '/matchmaker/$jobSlug': typeof MatchmakerJobSlugRoute
   '/tailor/cover-letter': typeof TailorCoverLetterRoute
   '/tailor/cv': typeof TailorCvRoute
@@ -212,13 +249,16 @@ export interface FileRoutesByTo {
   '/tailor/match': typeof TailorMatchRoute
   '/tailor/readiness': typeof TailorReadinessRoute
   '/tailor/strategy': typeof TailorStrategyRoute
+  '/advisor': typeof AdvisorIndexRoute
   '/tailor': typeof TailorIndexRoute
+  '/advisor/reviews/$reviewId': typeof AdvisorReviewsReviewIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/accept-advisor-invite': typeof AcceptAdvisorInviteRoute
   '/account': typeof AccountRoute
-  '/advisor': typeof AdvisorRoute
+  '/advisor': typeof AdvisorRouteWithChildren
   '/analytics': typeof AnalyticsRoute
   '/builder': typeof BuilderRoute
   '/cv': typeof CvRoute
@@ -233,6 +273,8 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/tailor': typeof TailorRouteWithChildren
   '/verify': typeof VerifyRoute
+  '/advisor/analytics': typeof AdvisorAnalyticsRoute
+  '/advisor/team': typeof AdvisorTeamRoute
   '/matchmaker/$jobSlug': typeof MatchmakerJobSlugRoute
   '/tailor/cover-letter': typeof TailorCoverLetterRoute
   '/tailor/cv': typeof TailorCvRoute
@@ -240,12 +282,15 @@ export interface FileRoutesById {
   '/tailor/match': typeof TailorMatchRoute
   '/tailor/readiness': typeof TailorReadinessRoute
   '/tailor/strategy': typeof TailorStrategyRoute
+  '/advisor/': typeof AdvisorIndexRoute
   '/tailor/': typeof TailorIndexRoute
+  '/advisor/reviews/$reviewId': typeof AdvisorReviewsReviewIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/accept-advisor-invite'
     | '/account'
     | '/advisor'
     | '/analytics'
@@ -262,6 +307,8 @@ export interface FileRouteTypes {
     | '/review'
     | '/tailor'
     | '/verify'
+    | '/advisor/analytics'
+    | '/advisor/team'
     | '/matchmaker/$jobSlug'
     | '/tailor/cover-letter'
     | '/tailor/cv'
@@ -269,12 +316,14 @@ export interface FileRouteTypes {
     | '/tailor/match'
     | '/tailor/readiness'
     | '/tailor/strategy'
+    | '/advisor/'
     | '/tailor/'
+    | '/advisor/reviews/$reviewId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/accept-advisor-invite'
     | '/account'
-    | '/advisor'
     | '/analytics'
     | '/builder'
     | '/cv'
@@ -288,6 +337,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/review'
     | '/verify'
+    | '/advisor/analytics'
+    | '/advisor/team'
     | '/matchmaker/$jobSlug'
     | '/tailor/cover-letter'
     | '/tailor/cv'
@@ -295,10 +346,13 @@ export interface FileRouteTypes {
     | '/tailor/match'
     | '/tailor/readiness'
     | '/tailor/strategy'
+    | '/advisor'
     | '/tailor'
+    | '/advisor/reviews/$reviewId'
   id:
     | '__root__'
     | '/'
+    | '/accept-advisor-invite'
     | '/account'
     | '/advisor'
     | '/analytics'
@@ -315,6 +369,8 @@ export interface FileRouteTypes {
     | '/review'
     | '/tailor'
     | '/verify'
+    | '/advisor/analytics'
+    | '/advisor/team'
     | '/matchmaker/$jobSlug'
     | '/tailor/cover-letter'
     | '/tailor/cv'
@@ -322,13 +378,16 @@ export interface FileRouteTypes {
     | '/tailor/match'
     | '/tailor/readiness'
     | '/tailor/strategy'
+    | '/advisor/'
     | '/tailor/'
+    | '/advisor/reviews/$reviewId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AcceptAdvisorInviteRoute: typeof AcceptAdvisorInviteRoute
   AccountRoute: typeof AccountRoute
-  AdvisorRoute: typeof AdvisorRoute
+  AdvisorRoute: typeof AdvisorRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
   BuilderRoute: typeof BuilderRoute
   CvRoute: typeof CvRoute
@@ -459,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accept-advisor-invite': {
+      id: '/accept-advisor-invite'
+      path: '/accept-advisor-invite'
+      fullPath: '/accept-advisor-invite'
+      preLoaderRoute: typeof AcceptAdvisorInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -472,6 +538,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tailor/'
       preLoaderRoute: typeof TailorIndexRouteImport
       parentRoute: typeof TailorRoute
+    }
+    '/advisor/': {
+      id: '/advisor/'
+      path: '/'
+      fullPath: '/advisor/'
+      preLoaderRoute: typeof AdvisorIndexRouteImport
+      parentRoute: typeof AdvisorRoute
     }
     '/tailor/strategy': {
       id: '/tailor/strategy'
@@ -522,8 +595,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MatchmakerJobSlugRouteImport
       parentRoute: typeof MatchmakerRoute
     }
+    '/advisor/team': {
+      id: '/advisor/team'
+      path: '/team'
+      fullPath: '/advisor/team'
+      preLoaderRoute: typeof AdvisorTeamRouteImport
+      parentRoute: typeof AdvisorRoute
+    }
+    '/advisor/analytics': {
+      id: '/advisor/analytics'
+      path: '/analytics'
+      fullPath: '/advisor/analytics'
+      preLoaderRoute: typeof AdvisorAnalyticsRouteImport
+      parentRoute: typeof AdvisorRoute
+    }
+    '/advisor/reviews/$reviewId': {
+      id: '/advisor/reviews/$reviewId'
+      path: '/reviews/$reviewId'
+      fullPath: '/advisor/reviews/$reviewId'
+      preLoaderRoute: typeof AdvisorReviewsReviewIdRouteImport
+      parentRoute: typeof AdvisorRoute
+    }
   }
 }
+
+interface AdvisorRouteChildren {
+  AdvisorAnalyticsRoute: typeof AdvisorAnalyticsRoute
+  AdvisorTeamRoute: typeof AdvisorTeamRoute
+  AdvisorIndexRoute: typeof AdvisorIndexRoute
+  AdvisorReviewsReviewIdRoute: typeof AdvisorReviewsReviewIdRoute
+}
+
+const AdvisorRouteChildren: AdvisorRouteChildren = {
+  AdvisorAnalyticsRoute: AdvisorAnalyticsRoute,
+  AdvisorTeamRoute: AdvisorTeamRoute,
+  AdvisorIndexRoute: AdvisorIndexRoute,
+  AdvisorReviewsReviewIdRoute: AdvisorReviewsReviewIdRoute,
+}
+
+const AdvisorRouteWithChildren =
+  AdvisorRoute._addFileChildren(AdvisorRouteChildren)
 
 interface MatchmakerRouteChildren {
   MatchmakerJobSlugRoute: typeof MatchmakerJobSlugRoute
@@ -562,8 +673,9 @@ const TailorRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AcceptAdvisorInviteRoute: AcceptAdvisorInviteRoute,
   AccountRoute: AccountRoute,
-  AdvisorRoute: AdvisorRoute,
+  AdvisorRoute: AdvisorRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
   BuilderRoute: BuilderRoute,
   CvRoute: CvRoute,

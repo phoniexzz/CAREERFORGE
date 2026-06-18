@@ -27,9 +27,16 @@ function LoginPage() {
   const handleQuickLogin = async (role: "student" | "advisor") => {
     setPending(true);
     try {
-      await login(role, "demo123");
+      const user = await login(role, "demo123");
       toast.success(`Logged in as ${role === "advisor" ? "Advisor" : "Student"}`);
-      await navigate({ to: search.redirect || "/" });
+      const requested = search.redirect;
+      const destination =
+        requested && isCompatibleRedirect(requested, user.role)
+          ? requested
+          : user.role === "advisor"
+            ? "/advisor"
+            : "/";
+      await navigate({ to: destination });
     } catch (error) {
       toast.error("Sign in failed");
     } finally {
@@ -45,13 +52,17 @@ function LoginPage() {
     }
     setPending(true);
     try {
-      await login(email, password || "demo123");
-      const targetRole = (email.toLowerCase().includes("advisor") || 
-                          email.toLowerCase().includes("teacher") || 
-                          email.toLowerCase().includes("jenkins") || 
-                          email.toLowerCase().includes("staff")) ? "Advisor" : "Student";
+      const user = await login(email, password || "demo123");
+      const targetRole = user.role === "advisor" ? "Advisor" : "Student";
       toast.success(`Logged in as ${targetRole}`);
-      await navigate({ to: search.redirect || "/" });
+      const requested = search.redirect;
+      const destination =
+        requested && isCompatibleRedirect(requested, user.role)
+          ? requested
+          : user.role === "advisor"
+            ? "/advisor"
+            : "/";
+      await navigate({ to: destination });
     } catch (error) {
       toast.error("Sign in failed", {
         description: error instanceof Error ? error.message : "Check your details.",
@@ -132,6 +143,14 @@ function LoginPage() {
       </div>
     </AuthShell>
   );
+}
+
+function isCompatibleRedirect(path: string, role: "student" | "advisor") {
+  if (!path.startsWith("/") || path.startsWith("//")) return false;
+  if (path === "/account") return true;
+  return role === "advisor"
+    ? path.startsWith("/advisor")
+    : !path.startsWith("/advisor");
 }
 
 function Field({

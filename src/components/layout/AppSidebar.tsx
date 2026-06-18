@@ -58,14 +58,23 @@ const ADVISOR_LINKS = [
     subtext: "Review requests",
     to: "/advisor" as const,
     icon: Home,
-    active: (pathname: string) => pathname === "/advisor" || pathname.startsWith("/advisor"),
+    active: (pathname: string) =>
+      pathname === "/advisor" ||
+      (pathname.startsWith("/advisor") && !pathname.includes("/analytics") && !pathname.includes("/team")),
   },
   {
-    label: "Cohort Analytics",
+    label: "Pipeline Analytics",
     subtext: "University trends",
-    to: "/analytics" as const,
+    to: "/advisor/analytics" as const,
     icon: BarChart3,
-    active: (pathname: string) => pathname === "/analytics",
+    active: (pathname: string) => pathname.startsWith("/advisor/analytics"),
+  },
+  {
+    label: "Advisor Team",
+    subtext: "Staff management",
+    to: "/advisor/team" as const,
+    icon: UserRound,
+    active: (pathname: string) => pathname.startsWith("/advisor/team"),
   },
 ];
 

@@ -2,6 +2,7 @@ import { exampleResume } from "./mock-cv";
 import { type ResumeRecord } from "./resume-api";
 import { type JobMatch, type JobMatchDetail, type MatchList, type MatchPreferences } from "./matchmaker-api";
 import { type AdvisorReview } from "./advisor-review-api";
+import { defaultLayoutPreferences } from "./resume-types";
 
 // Toggle for Demo Mode
 export const DEMO_MODE = true;
@@ -49,14 +50,7 @@ const getDemoResume = () => {
     name: "Base CV",
     careerStage: "graduate",
     template: "graduate-compact",
-    layoutPreferences: {
-      fontSize: "10pt",
-      margins: "0.75in",
-      fontFamily: "Inter",
-      lineSpacing: "1.15",
-      sectionSpacing: "12pt",
-      showProfilePicture: false,
-    },
+    layoutPreferences: defaultLayoutPreferences(),
     revision: 1,
     data: exampleResume(),
     createdAt: new Date().toISOString(),
@@ -284,12 +278,14 @@ function calculateMatches(resume: ResumeRecord): JobMatchDetail[] {
 }
 
 // Initial Advisor Queue Data
-const DEFAULT_REVIEWS: AdvisorReview[] = [
+const DEFAULT_REVIEWS: any[] = [
   {
     id: "rev_001",
     resumeId: "res_001",
     resumeVersionId: "v_001",
     status: "pending",
+    studentName: "Alex Morgan",
+    resumeName: "Base CV",
     studentMessage: "Hi advisor, looking for feedback on my J.P. Morgan Risk Analyst application. Thanks!",
     advisorName: null,
     overallSummary: "",
@@ -300,9 +296,11 @@ const DEFAULT_REVIEWS: AdvisorReview[] = [
   },
   {
     id: "rev_002",
-    resumeId: "res_002",
+    resumeId: "res_001", // Match res_001 in demo
     resumeVersionId: "v_002",
     status: "pending",
+    studentName: "Praveen Binoy",
+    resumeName: "Base CV",
     studentMessage: "I need feedback for PwC technology consulting CV. I'm worried my skills section is a bit weak.",
     advisorName: null,
     overallSummary: "",
@@ -313,6 +311,42 @@ const DEFAULT_REVIEWS: AdvisorReview[] = [
 
 const getDemoReviews = () => getStorageItem<AdvisorReview[]>("careerforge_demo_reviews", DEFAULT_REVIEWS);
 const saveDemoReviews = (reviews: AdvisorReview[]) => setStorageItem("careerforge_demo_reviews", reviews);
+
+const DEFAULT_ADVISORS = [
+  {
+    id: "u-advisor",
+    email: "sarah.jenkins@southampton.ac.uk",
+    fullName: "Dr. Sarah Jenkins",
+    isActive: true,
+    isVerified: true,
+    canManageAdvisors: true,
+    invitationPending: false,
+    createdAt: "2026-06-01T08:00:00Z"
+  },
+  {
+    id: "adv_002",
+    email: "john.davis@southampton.ac.uk",
+    fullName: "John Davis",
+    isActive: true,
+    isVerified: true,
+    canManageAdvisors: false,
+    invitationPending: false,
+    createdAt: "2026-06-05T09:30:00Z"
+  },
+  {
+    id: "adv_003",
+    email: "emma.wilson@southampton.ac.uk",
+    fullName: "Emma Wilson",
+    isActive: false,
+    isVerified: false,
+    canManageAdvisors: false,
+    invitationPending: true,
+    createdAt: "2026-06-10T14:15:00Z"
+  }
+];
+
+const getDemoAdvisors = () => getStorageItem<any[]>("careerforge_demo_advisors", DEFAULT_ADVISORS);
+const saveDemoAdvisors = (advisors: any[]) => setStorageItem("careerforge_demo_advisors", advisors);
 
 const getDemoPreferences = () => {
   const defaultPrefs: MatchPreferences = {
@@ -378,6 +412,7 @@ async function handleMockRequest(path: string, init: RequestInit): Promise<any> 
       role: "advisor",
       isVerified: true,
       isActive: true,
+      canManageAdvisors: true,
       createdAt: new Date().toISOString(),
     } : {
       id: "u-student",
@@ -403,6 +438,26 @@ async function handleMockRequest(path: string, init: RequestInit): Promise<any> 
       document.cookie = "careerforge_csrf=; path=/; max-age=0";
     }
     return null;
+  }
+
+  if (path.startsWith("/auth/accept-advisor-invite") && method === "POST") {
+    const advisors = getDemoAdvisors();
+    const pendingAdv = advisors.find(a => a.invitationPending);
+    if (pendingAdv) {
+      pendingAdv.isActive = true;
+      pendingAdv.isVerified = true;
+      pendingAdv.invitationPending = false;
+      saveDemoAdvisors(advisors);
+    }
+    return {
+      id: pendingAdv?.id || "adv_demo",
+      email: pendingAdv?.email || "new.advisor@southampton.ac.uk",
+      fullName: pendingAdv?.fullName || "New Advisor",
+      role: "advisor",
+      isVerified: true,
+      isActive: true,
+      createdAt: new Date().toISOString()
+    };
   }
 
   // 2. Resume Handlers
@@ -541,20 +596,27 @@ async function handleMockRequest(path: string, init: RequestInit): Promise<any> 
   }
 
   // 4. Advisor Review Handlers
-  if (path.includes("/advisor-reviews/resumes/") && path.endsWith("/latest")) {
+  const latestReviewMatch = path.match(/^\/advisor-reviews\/resumes\/([a-zA-Z0-9_-]+)\/latest$/);
+  if (latestReviewMatch) {
+    const resId = latestReviewMatch[1];
     const reviews = getDemoReviews();
-    const mine = reviews.find((r) => r.status === "pending" || r.status === "in_review") || null;
-    return mine;
+    const resumeReviews = reviews.filter((r) => r.resumeId === resId);
+    if (resumeReviews.length === 0) return null;
+    return resumeReviews[resumeReviews.length - 1];
   }
 
-  if (path.includes("/advisor-reviews/resumes/") && method === "POST") {
+  const createReviewMatch = path.match(/^\/advisor-reviews\/resumes\/([a-zA-Z0-9_-]+)$/);
+  if (createReviewMatch && method === "POST") {
+    const resId = createReviewMatch[1];
     const reviews = getDemoReviews();
     const resume = getDemoResume();
-    const newRev: AdvisorReview = {
+    const user = getDemoUser();
+    const newRev: any = {
       id: "rev_" + Date.now(),
-      resumeId: resume.id,
+      resumeId: resId,
       resumeVersionId: "v_" + resume.revision,
       status: "pending",
+      studentName: user?.fullName || "Alex Morgan",
       studentMessage: body?.message || "Please review my CV.",
       advisorName: null,
       overallSummary: "",
@@ -577,6 +639,285 @@ async function handleMockRequest(path: string, init: RequestInit): Promise<any> 
       saveDemoReviews(reviews);
       return item;
     }
+  }
+
+  // Detailed Advisor Review Workspace & Queue Handlers
+  if (path === "/advisor-reviews/summary") {
+    const reviews = getDemoReviews();
+    const user = getDemoUser();
+    const advisorName = user?.fullName || "Dr. Sarah Jenkins";
+    
+    const available = reviews.filter((r) => r.status === "pending").length;
+    const mine = reviews.filter((r) => r.status === "in_review" && r.advisorName === advisorName).length;
+    const completed = reviews.filter((r) => r.status === "completed").length;
+    
+    return { available, mine, completed };
+  }
+
+  if (path.startsWith("/advisor-reviews/queue")) {
+    const url = new URL(path, "http://localhost");
+    const view = url.searchParams.get("view") || "available";
+    const reviews = getDemoReviews();
+    const user = getDemoUser();
+    const advisorName = user?.fullName || "Dr. Sarah Jenkins";
+
+    let filtered: any[] = [];
+    if (view === "available") {
+      filtered = reviews.filter((r) => r.status === "pending");
+    } else if (view === "mine") {
+      filtered = reviews.filter((r) => r.status === "in_review" && r.advisorName === advisorName);
+    } else if (view === "completed") {
+      filtered = reviews.filter((r) => r.status === "completed");
+    }
+
+    const items = filtered.map((r) => ({
+      id: r.id,
+      resumeId: r.resumeId,
+      resumeName: r.resumeName || "Base CV",
+      studentName: r.studentName || "Alex Morgan",
+      status: r.status,
+      assignedAdvisorName: r.advisorName,
+      hasStudentMessage: !!r.studentMessage,
+      submittedAt: r.submittedAt,
+      claimedAt: r.claimedAt || null
+    }));
+
+    return {
+      items,
+      total: items.length,
+      page: 1,
+      pageSize: 20,
+      hasMore: false
+    };
+  }
+
+  const claimMatch = path.match(/^\/advisor-reviews\/([a-zA-Z0-9_-]+)\/claim$/);
+  if (claimMatch && method === "POST") {
+    const revId = claimMatch[1];
+    const reviews = getDemoReviews();
+    const index = reviews.findIndex((r) => r.id === revId);
+    if (index === -1) throw new ApiError("Review not found", 404);
+    
+    const user = getDemoUser();
+    const advisorName = user?.fullName || "Dr. Sarah Jenkins";
+    
+    reviews[index].status = "in_review";
+    reviews[index].advisorName = advisorName;
+    reviews[index].claimedAt = new Date().toISOString();
+    reviews[index].draftRevision = (reviews[index].draftRevision || 0) + 1;
+    saveDemoReviews(reviews);
+    
+    const resume = getDemoResume();
+    return {
+      ...reviews[index],
+      snapshot: {
+        id: reviews[index].resumeId,
+        name: reviews[index].resumeName || "Base CV",
+        template: resume.template,
+        data: resume.data
+      },
+      draftRevision: reviews[index].draftRevision
+    };
+  }
+
+  const draftMatch = path.match(/^\/advisor-reviews\/([a-zA-Z0-9_-]+)\/draft$/);
+  if (draftMatch && method === "PUT") {
+    const revId = draftMatch[1];
+    const reviews = getDemoReviews();
+    const index = reviews.findIndex((r) => r.id === revId);
+    if (index === -1) throw new ApiError("Review not found", 404);
+    
+    reviews[index].overallSummary = body.overallSummary || "";
+    reviews[index].comments = (body.comments || []).map((c: any, i: number) => ({
+      id: c.id || "c_" + Date.now() + "_" + i,
+      section: c.section,
+      priority: c.priority,
+      comment: c.comment
+    }));
+    reviews[index].draftRevision = (body.draftRevision || 0) + 1;
+    reviews[index].draftSavedAt = new Date().toISOString();
+    saveDemoReviews(reviews);
+    
+    const resume = getDemoResume();
+    return {
+      ...reviews[index],
+      snapshot: {
+        id: reviews[index].resumeId,
+        name: reviews[index].resumeName || "Base CV",
+        template: resume.template,
+        data: resume.data
+      },
+      draftRevision: reviews[index].draftRevision,
+      draftSavedAt: reviews[index].draftSavedAt
+    };
+  }
+
+  const releaseMatch = path.match(/^\/advisor-reviews\/([a-zA-Z0-9_-]+)\/release$/);
+  if (releaseMatch && method === "POST") {
+    const revId = releaseMatch[1];
+    const reviews = getDemoReviews();
+    const index = reviews.findIndex((r) => r.id === revId);
+    if (index === -1) throw new ApiError("Review not found", 404);
+    
+    reviews[index].status = "pending";
+    reviews[index].advisorName = null;
+    reviews[index].claimedAt = null;
+    reviews[index].draftRevision = (reviews[index].draftRevision || 0) + 1;
+    saveDemoReviews(reviews);
+    return reviews[index];
+  }
+
+  const feedbackMatch = path.match(/^\/advisor-reviews\/([a-zA-Z0-9_-]+)\/feedback$/);
+  if (feedbackMatch && method === "POST") {
+    const revId = feedbackMatch[1];
+    const reviews = getDemoReviews();
+    const index = reviews.findIndex((r) => r.id === revId);
+    if (index === -1) throw new ApiError("Review not found", 404);
+    
+    reviews[index].status = "completed";
+    reviews[index].completedAt = new Date().toISOString();
+    reviews[index].draftRevision = (body?.draftRevision || reviews[index].draftRevision || 0) + 1;
+    saveDemoReviews(reviews);
+    
+    const resume = getDemoResume();
+    return {
+      ...reviews[index],
+      snapshot: {
+        id: reviews[index].resumeId,
+        name: reviews[index].resumeName || "Base CV",
+        template: resume.template,
+        data: resume.data
+      },
+      draftRevision: reviews[index].draftRevision
+    };
+  }
+
+  const detailMatch = path.match(/^\/advisor-reviews\/([a-zA-Z0-9_-]+)$/);
+  if (detailMatch && method === "GET") {
+    const revId = detailMatch[1];
+    const reviews = getDemoReviews();
+    const item = reviews.find((r) => r.id === revId);
+    if (!item) throw new ApiError("Review not found", 404);
+    
+    const resume = getDemoResume();
+    return {
+      ...item,
+      snapshot: {
+        id: item.resumeId,
+        name: item.resumeName || "Base CV",
+        template: resume.template,
+        data: resume.data
+      },
+      draftRevision: item.draftRevision || 1
+    };
+  }
+  // Detailed Advisor Analytics Handlers
+  if (path.startsWith("/advisor-analytics/overview")) {
+    return {
+      generatedAt: new Date().toISOString(),
+      weeks: 12,
+      minimumGroupSize: 5,
+      summary: {
+        activeStudents: 142,
+        baseCvs: 128,
+        tailoredCvs: 84,
+        trackedApplications: 53,
+        completedReviews: 45,
+        reviewQueue: 2,
+        averageMatchScore: 78,
+        mostCommonGap: { skill: "SQL", students: 34 }
+      },
+      funnel: [
+        { key: "registered", label: "Registered Students", count: 180, percentage: 100 },
+        { key: "base_cv", label: "Created Base CV", count: 128, percentage: 71 },
+        { key: "matches", label: "Viewed Job Matches", count: 95, percentage: 53 },
+        { key: "tailored", label: "Tailored Applications", count: 84, percentage: 47 },
+        { key: "applied", label: "Submitted Applications", count: 53, percentage: 29 }
+      ],
+      matchScoreDistribution: [
+        { range: "90-100", count: 12, suppressed: false },
+        { range: "80-89", count: 28, suppressed: false },
+        { range: "70-79", count: 42, suppressed: false },
+        { range: "60-69", count: 22, suppressed: false },
+        { range: "50-59", count: 15, suppressed: false },
+        { range: "0-49", count: 9, suppressed: false }
+      ],
+      careerStages: [
+        { stage: "Graduate / Early Career", students: 85, matched: 72, tailored: 58, applied: 36 },
+        { stage: "Undergraduate / Placement Year", students: 43, matched: 35, tailored: 22, applied: 14 },
+        { stage: "Postgraduate / PhD", students: 14, matched: 12, tailored: 4, applied: 3 }
+      ],
+      skillGaps: [
+        { skill: "SQL", students: 34 },
+        { skill: "Python", students: 28 },
+        { skill: "Tableau", students: 19 },
+        { skill: "Power BI", students: 15 },
+        { skill: "Agile / Scrum", students: 12 }
+      ],
+      targetRoles: [
+        { role: "Business Analyst", students: 45 },
+        { role: "Data Analyst", students: 38 },
+        { role: "Software Engineer", students: 22 },
+        { role: "Risk Analyst", students: 15 },
+        { role: "Consultant", students: 12 }
+      ],
+      engagement: [
+        { weekStart: "2026-04-06", label: "06 Apr", activeStudents: 92, suppressed: false },
+        { weekStart: "2026-04-13", label: "13 Apr", activeStudents: 88, suppressed: false },
+        { weekStart: "2026-04-20", label: "20 Apr", activeStudents: 95, suppressed: false },
+        { weekStart: "2026-04-27", label: "27 Apr", activeStudents: 104, suppressed: false },
+        { weekStart: "2026-05-04", label: "04 May", activeStudents: 110, suppressed: false },
+        { weekStart: "2026-05-11", label: "11 May", activeStudents: 115, suppressed: false },
+        { weekStart: "2026-05-18", label: "18 May", activeStudents: 120, suppressed: false },
+        { weekStart: "2026-05-25", label: "25 May", activeStudents: 108, suppressed: false },
+        { weekStart: "2026-06-01", label: "01 Jun", activeStudents: 132, suppressed: false },
+        { weekStart: "2026-06-08", label: "08 Jun", activeStudents: 140, suppressed: false },
+        { weekStart: "2026-06-15", label: "15 Jun", activeStudents: 142, suppressed: false }
+      ]
+    };
+  }
+  // Detailed Advisor Team Management Handlers
+  if (path === "/advisor-admin/advisors" && method === "GET") {
+    return getDemoAdvisors();
+  }
+
+  if (path === "/advisor-admin/invitations" && method === "POST") {
+    const advisors = getDemoAdvisors();
+    const newAdv = {
+      id: "adv_" + Date.now(),
+      email: body.email,
+      fullName: body.fullName,
+      isActive: false,
+      isVerified: false,
+      canManageAdvisors: body.canManageAdvisors || false,
+      invitationPending: true,
+      createdAt: new Date().toISOString()
+    };
+    advisors.push(newAdv);
+    saveDemoAdvisors(advisors);
+    return newAdv;
+  }
+
+  const resendInviteMatch = path.match(/^\/advisor-admin\/advisors\/([a-zA-Z0-9_-]+)\/resend-invite$/);
+  if (resendInviteMatch && method === "POST") {
+    const advId = resendInviteMatch[1];
+    const advisors = getDemoAdvisors();
+    const index = advisors.findIndex((a) => a.id === advId);
+    if (index === -1) throw new ApiError("Advisor not found", 404);
+    return advisors[index];
+  }
+
+  const updateAdvisorMatch = path.match(/^\/advisor-admin\/advisors\/([a-zA-Z0-9_-]+)$/);
+  if (updateAdvisorMatch && method === "PATCH") {
+    const advId = updateAdvisorMatch[1];
+    const advisors = getDemoAdvisors();
+    const index = advisors.findIndex((a) => a.id === advId);
+    if (index === -1) throw new ApiError("Advisor not found", 404);
+    
+    if (body.isActive !== undefined) advisors[index].isActive = body.isActive;
+    if (body.canManageAdvisors !== undefined) advisors[index].canManageAdvisors = body.canManageAdvisors;
+    saveDemoAdvisors(advisors);
+    return advisors[index];
   }
 
   // 5. AI Functions Mocks
@@ -697,6 +1038,11 @@ export function apiBlobRequest(
       if (path.includes("docx")) {
         return new Blob(["Mock DOCX Download - Reconnect backend to compile Word documents"], {
           type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        });
+      }
+      if (path.includes("export.csv") || path.includes(".csv")) {
+        return new Blob(["Mock CSV Export - Reconnect backend to export actual CSV reports"], {
+          type: "text/csv"
         });
       }
       // Return a basic PDF text document as blob

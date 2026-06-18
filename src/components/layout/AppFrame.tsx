@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { useAuth } from "@/lib/auth";
 import { AppNav } from "./AppNav";
+import { AdvisorDesktopSidebar, AdvisorMobileHeader } from "./AdvisorSidebar";
 import { DesktopSidebar, MobileWorkspaceHeader } from "./AppSidebar";
 
 const PUBLIC_PATHS = new Set([
@@ -12,6 +13,7 @@ const PUBLIC_PATHS = new Set([
   "/forgot-password",
   "/reset-password",
   "/recover-account",
+  "/accept-advisor-invite",
 ]);
 
 export function AppFrame({ children }: { children: ReactNode }) {
@@ -24,6 +26,18 @@ export function AppFrame({ children }: { children: ReactNode }) {
       <div className="min-h-screen bg-background text-ink">
         <AppNav />
         {children}
+      </div>
+    );
+  }
+
+  if (user.role === "advisor") {
+    return (
+      <div className="min-h-screen bg-[#f7f5f1] text-ink lg:flex">
+        <AdvisorDesktopSidebar />
+        <div className="min-w-0 flex-1">
+          <AdvisorMobileHeader />
+          {children}
+        </div>
       </div>
     );
   }
